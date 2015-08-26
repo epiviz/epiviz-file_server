@@ -15,7 +15,7 @@ It will use the `epivizr` package to handle the epiviz data exchange protocol.
 To start an epivizFileServer instance use
 
 ```{bash}
-R CMD epivizFileServer <options> measurements.yaml
+R CMD Rserve <options> --RS-source 'epivizServer_init.R' --args measurements.yaml
 ```
 
 File `measurements.yaml` indicates location and description of data files to be served. For example
@@ -73,5 +73,15 @@ Options:
   and, if necessary, it might be easier to transition away from Rserve for the actual data
   handling.
   
+## TODO
+
+1. Code `epivizServer_init.R`, parses yaml file, sets up `EpivizDeviceManager` instance that
+   will serve data based on DataProviderAPI requests.
+   
+2. Code `epivizServer_middleware.py`, based on `epivizpy`, exposes WebSocket connection,
+   opens connection to Rserve instance, verifies and sanitizes incoming requests, passes them     off to Rserve, funnels resulting JSON through WebSocket connection.
+   
+3. Create new epiviz file adapters for new file formats
+
   
 
