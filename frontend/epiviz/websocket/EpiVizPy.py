@@ -11,6 +11,8 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 
+import pyRserve
+
 from epiviz.websocket.EpiVizPyEndpoint import EpiVizPyEndpoint
 
 
@@ -27,10 +29,13 @@ class EpiVizPy(object):
         self._rserve_conn = pyRserve.connect(host=rserve_host, port=rserve_port)
 
         # define the handler function
-        self._rserve_conn.voidEval("""handle_request <- function(id, action, msgData)
+        self._rserve_conn.voidEval("""handle_request <- function(json_message)
                                    {
+                                     message <- rjson:::fromJSON(json_message)
+                                     msgData <- message$data
+                                     action <- msgData$action
                                      out <- list(type="response",
-                                                 requestId=id,
+                                                 requestId=message$requestId,
                                                  data=NULL);
                                      out$data <- mgr$handle(action, msgData);
                                      epivizr:::toJSON(out)
@@ -41,7 +46,7 @@ class EpiVizPy(object):
         self._console_listener = console_listener
         self._application = tornado.web.Application([(server_path, EpiVizPyEndpoint, {
           'console_listener': console_listener,
-          'handler': self.handler
+          'handler': self._handler
         })])
 
     def start(self, port=8888):

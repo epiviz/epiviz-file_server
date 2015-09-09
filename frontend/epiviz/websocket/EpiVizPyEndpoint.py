@@ -28,16 +28,16 @@ class EpiVizPyEndpoint(tornado.websocket.WebSocketHandler):
 
         super(EpiVizPyEndpoint, self).__init__(*args, **kwargs)
 
+    def check_origin(self, origin):
+        return True
+
     def open(self):
         print 'new connection'
 
     def on_message(self, json_message):
         print 'message received %s' % json_message
-        message = simplejson.loads(json_message)
-
-        if message['type'] == 'request':
-            request = Request.from_raw_object(message)
-            self._handle_request(request)
+#        message = simplejson.loads(json_message)
+        self._handle_request(json_message)
 
     def on_close(self):
         if not self._console_listener is None:
@@ -50,7 +50,7 @@ class EpiVizPyEndpoint(tornado.websocket.WebSocketHandler):
         :param request: Request
         '''
 
-    def _handle_request(self, request):
-        action = request.get('action')
-        message = self._handler(request.id(), request.get('action'), request._args)
-        self.write_message(message)
+    def _handle_request(self, json_message):
+        response = self._handler(json_message)
+        print 'sending response %s' % response
+        self.write_message(response)
