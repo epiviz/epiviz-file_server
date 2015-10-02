@@ -1,0 +1,8 @@
+Package: epivizFileServer
+Title: Serve data in disk files to the epiviz web app through a socket connection via Rserve.
+Version: 0.0.0.9000
+Authors@R: person("Hector", "Corrada Bravo", email = "hcorrada@gmail.com", role = c("aut", "cre"))
+Description: Serve data in disk files to the epiviz web app through a socket connection via Rserve.
+Depends: R (>= 3.2.2), Rserve, epivizr
+License: Artistic-2.0
+LazyData: true
