@@ -15,3 +15,7 @@ EpivizFileServer <- function(resourceSet) {
   mgr <- epivizr:::EpivizDeviceMgr$new()
   new("EpivizFileServer", mgr=mgr, resourceSet=resourceSet)
 }
+
+handle_request <- function(fileServer, action, msgData) {
+  fileServer@mgr$handle(action, msgData)
+}

@@ -36,8 +36,8 @@ class EpiVizPy(object):
                                      action <- msgData$action
                                      out <- list(type="response",
                                                  requestId=message$requestId,
-                                                 data=NULL);
-                                     out$data <- mgr$handle(action, msgData);
+                                                 data=NULL)
+                                     out$data <- epivizFileServer::handle_request(fileServer, action, msgData)
                                      epivizr:::toJSON(out)
                                   }""")
         self._handler = self._rserve_conn.r.handle_request

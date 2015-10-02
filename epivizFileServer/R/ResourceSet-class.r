@@ -8,7 +8,7 @@ setMethod("show", "ResourceSet",
          function(object) {
            cat(paste0("ResourceSet:\n",
                   "  source: ", object@sourceString, "\n",
-                  "  ",length(object@resources), " resources\n"))
+                  "  ", length(object@resources), " resources\n"))
          })
 
 ResourceSet <- function(sourceString) {
