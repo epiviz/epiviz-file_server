@@ -10,10 +10,6 @@ startBackend <- function() {
   Rserve::Rserve(args=paste0("--RS-source '", initfile, "' --args ", resourceSet_source))
 }
 
-startFrontend <- function() {
-  python_dir <- system.file("frontend", package="epivizFileServer")
-  command <- paste0("cd ", python_dir, " & ",
-                    "python main.py")
-  cat("Starting tornado front end with command", command, "\n")
-  system(command)
+frontendPath <- function() {
+  cat(system.file("frontend", package="epivizFileServer"))
 }

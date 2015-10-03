@@ -27,7 +27,7 @@ See [wiki](https://github.com/epiviz/epivizFileServer/wiki) for information on t
 To start the python tornado frontend run
 
 ```{bash}
-Rscript -e "epivizFileServer::startFrontend()"
+python `Rscript -e "epivizFileServer::frontendPath()"`
 ```
 
 This requires python with tornado installed.
