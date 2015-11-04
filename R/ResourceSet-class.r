@@ -24,8 +24,8 @@ setMethod("show", "Resource",
                        " data class: ", class(object@dataObject)))
           })
 
-.createResource <- function(name, record) {
-  path <- record$url
+.createResource <- function(name, record, basedir) {
+  path <- file.path(basedir, record$url)
   format <- tools::file_ext(path)
 
   if (!is.null(record$filetype)) {
@@ -39,7 +39,8 @@ setMethod("show", "Resource",
 
 .parseResources_yaml <- function(filepath) {
   resourceRecords <- yaml::yaml.load_file(filepath)
-  mapply(.createResource, name=names(resourceRecords), record=resourceRecords)
+  basedir <- dirname(tools::file_path_as_absolute(filepath))
+  mapply(.createResource, name=names(resourceRecords), record=resourceRecords, basedir=basedir)
 }
 
 .parseResources <- function(sourceString) {
