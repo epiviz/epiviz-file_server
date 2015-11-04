@@ -56,3 +56,13 @@ ResourceSet <- function(sourceString) {
   resources <- .parseResources(sourceString)
   new("ResourceSet", sourceString=sourceString, resources=resources)
 }
+
+.addMeasurements_fromResource <- function(mgr, resource) {
+  mgr$addMeasurements(resource@dataObject, resource@name)
+}
+
+.addMeasurements_fromResourceSet <- function(mgr, resourceSet) {
+  for (resource in resourceSet@resources) {
+    .addMeasurements_fromResource(mgr, resource)
+  }
+}

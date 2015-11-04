@@ -13,6 +13,7 @@ setMethod("show", "EpivizFileServer",
 
 EpivizFileServer <- function(resourceSet) {
   mgr <- epivizr:::EpivizDeviceMgr$new()
+  .addMeasurements_fromResourceSet(mgr, resourceSet)
   new("EpivizFileServer", mgr=mgr, resourceSet=resourceSet)
 }
 
