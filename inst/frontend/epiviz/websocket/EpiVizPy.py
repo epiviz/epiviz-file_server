@@ -16,6 +16,22 @@ import pyRserve
 from epiviz.websocket.EpiVizPyEndpoint import EpiVizPyEndpoint
 
 
+def connect_to_rserve(host, port, wait_time=2, wait_loop=10):
+  i = 0
+  conn = None
+  exception = None
+
+  while i < wait_loop:
+    i += 1
+    try:
+      conn = pyRserve.connect(host=host, port=port)
+      break
+    except e:
+      exception = e
+  if conn is None:
+    raise exception
+  return conn
+
 class EpiVizPy(object):
     '''
     classdocs
@@ -26,7 +42,7 @@ class EpiVizPy(object):
         Constructor
         '''
         # start Rserve connection
-        self._rserve_conn = pyRserve.connect(host=rserve_host, port=rserve_port)
+        self._rserve_conn = connect_to_rserve(host=rserve_host, port=rserve_port)
 
         # define the handler function
         self._rserve_conn.voidEval("""handle_request <- function(json_message)
