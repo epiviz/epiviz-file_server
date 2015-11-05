@@ -12,6 +12,7 @@ import tornado.ioloop
 import tornado.web
 
 import pyRserve
+import time
 
 from epiviz.websocket.EpiVizPyEndpoint import EpiVizPyEndpoint
 
@@ -23,11 +24,13 @@ def connect_to_rserve(host, port, wait_time=2, wait_loop=10):
 
   while i < wait_loop:
     i += 1
+    print "Connection attempt %d of %d " % (i, wait_loop)
     try:
       conn = pyRserve.connect(host=host, port=port)
       break
-    except e:
+    except pyRserve.rexceptions.RConnectionRefused as e:
       exception = e
+    time.sleep(wait_time)
   if conn is None:
     raise exception
   return conn
