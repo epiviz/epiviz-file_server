@@ -18,6 +18,7 @@ from epiviz.websocket.EpiVizPyEndpoint import EpiVizPyEndpoint
 
 
 def connect_to_rserve(host, port, wait_time=2, wait_loop=10):
+  print "Connecting to Rserve at %s:%d" % (host, port)
   i = 0
   conn = None
   exception = None

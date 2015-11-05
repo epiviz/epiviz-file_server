@@ -2,3 +2,4 @@ tornado
 simplejson
 enum
 pyRserve
+docopt
