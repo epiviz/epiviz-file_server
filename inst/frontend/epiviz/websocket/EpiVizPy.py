@@ -6,6 +6,7 @@ Created on Mar 12, 2014
 
 from threading import Lock
 import threading
+import logging
 
 import tornado.httpserver
 import tornado.ioloop
@@ -15,17 +16,17 @@ import pyRserve
 import time
 
 from epiviz.websocket.EpiVizPyEndpoint import EpiVizPyEndpoint
-
+from epiviz.websocket.MainHandler import MainHandler
 
 def connect_to_rserve(host, port, wait_time=2, wait_loop=10):
-  print "Connecting to Rserve at %s:%d" % (host, port)
+  logging.info("Connecting to Rserve at %s:%d" % (host, port))
   i = 0
   conn = None
   exception = None
 
   while i < wait_loop:
     i += 1
-    print "Connection attempt %d of %d " % (i, wait_loop)
+    logging.info("Connection attempt %d of %d " % (i, wait_loop))
     try:
       conn = pyRserve.connect(host=host, port=port)
       break
@@ -34,6 +35,8 @@ def connect_to_rserve(host, port, wait_time=2, wait_loop=10):
     time.sleep(wait_time)
   if conn is None:
     raise exception
+
+  logging.info("Connection to Rserve successful.")
   return conn
 
 class EpiVizPy(object):
@@ -60,14 +63,27 @@ class EpiVizPy(object):
                                      out$data <- epivizFileServer::handle_request(fileServer, action, msgData)
                                      epivizr:::toJSON(out)
                                   }""")
+        self._rserve_conn.voidEval("""show_server <- function()
+                                   {
+                                        conn <- textConnection("out", open="w")
+                                        capture.output(show(fileServer), file=conn)
+                                        close(conn)
+                                        paste(out, collapse="\n")
+                                   }""")
+
         self._handler = self._rserve_conn.r.handle_request
+        self._main_handler = self._rserve_conn.r.show_server
+
         self._thread = None
         self._server = None
         self._console_listener = console_listener
-        self._application = tornado.web.Application([(server_path, EpiVizPyEndpoint, {
-          'console_listener': console_listener,
-          'handler': self._handler
-        })])
+        self._application = tornado.web.Application([
+            (server_path, EpiVizPyEndpoint, {
+                'console_listener': console_listener,
+                'handler': self._handler}),
+            (r"/", MainHandler, {
+                'handler': self._main_handler
+            })])
 
     def start(self, port=8888):
         self.stop()
