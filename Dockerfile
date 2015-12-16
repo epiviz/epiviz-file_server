@@ -27,6 +27,8 @@ RUN installPackage.r -p /epivizfs_pkg/epivizFileServer
 
 # copy example data to be used by file server backend
 COPY inst/extdata /epivizfs_data
+COPY inst/docker/startEpivizBackend.r /usr/bin
+RUN chmod u+x /usr/bin/startEpivizBackend.r
 
 # run everything through supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
