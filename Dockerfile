@@ -18,7 +18,6 @@ RUN cd /epivizfs_frontend && \
 COPY inst/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chgrp staff /etc/supervisor/conf.d/supervisord.conf
 
-
 EXPOSE 8888
 
 # install the file server package
@@ -29,6 +28,9 @@ RUN installPackage.r -p /epivizfs_pkg/epivizFileServer
 COPY inst/extdata /epivizfs_data
 COPY inst/docker/startEpivizBackend.r /usr/bin
 RUN chmod u+x /usr/bin/startEpivizBackend.r
+
+# expose the data directory as a volume for other containers to use or persist data.
+VOLUME /epivizfs_data
 
 # run everything through supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
