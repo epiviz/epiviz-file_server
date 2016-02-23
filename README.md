@@ -99,3 +99,5 @@ docker run -t -i --volumes-from epivizfs ubuntu /bin/bash
 ```
 
 After docker loads the ubuntu image, if you list files in the current directory, you should be able to see the mounted epiviz data directory. Any changes made to the data directory from any container should be persistent.
+
+NOTE: Removing a docker container removes the linked/created volume. The volume only persists as long as there's atleast one container referencing it.
