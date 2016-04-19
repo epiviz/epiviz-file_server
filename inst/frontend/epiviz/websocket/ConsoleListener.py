@@ -19,7 +19,7 @@ class ConsoleListener(object):
         '''
         Constructor
         '''
-        self._command_received = Event();
+        self._command_received = Event()
 
 
     def on_command_received(self):

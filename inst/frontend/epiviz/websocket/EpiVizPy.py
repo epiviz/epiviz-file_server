@@ -9,14 +9,18 @@ import threading
 import logging
 
 import tornado.httpserver
+import tornado.wsgi
 import tornado.ioloop
 import tornado.web
 
 import pyRserve
 import time
 
+from pprint import pprint
+
 from epiviz.websocket.EpiVizPyEndpoint import EpiVizPyEndpoint
 from epiviz.websocket.MainHandler import MainHandler
+from epiviz.websocket.Measurements import app
 
 def connect_to_rserve(host, port, wait_time=2, wait_loop=10):
   logging.info("Connecting to Rserve at %s:%d" % (host, port))
@@ -72,7 +76,10 @@ class EpiVizPy(object):
                                    }""")
 
         self._handler = self._rserve_conn.r.handle_request
+
         self._main_handler = self._rserve_conn.r.show_server
+
+        tr = tornado.wsgi.WSGIContainer(app)
 
         self._thread = None
         self._server = None
@@ -83,7 +90,9 @@ class EpiVizPy(object):
                 'handler': self._handler}),
             (r"/", MainHandler, {
                 'handler': self._main_handler
-            })])
+            }),
+            (r".*", tornado.web.FallbackHandler, dict(fallback=tr))
+            ], debug=True)
 
     def start(self, port=8888):
         self.stop()
