@@ -8,6 +8,9 @@ import numpy as np
 import websocket
 from pprint import pprint
 
+import pyRserve
+import EpiVizPy as ePy
+
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
@@ -29,12 +32,22 @@ app.after_request(add_cors_headers)
 def getEpivizMeasurements():
     res = cache.get('measurements_raw')
     if not res:
-        ws = websocket.create_connection("ws://127.0.0.1:8888/ws")
-        ws.send(json.dumps({"requestId":"1","type":"request","data":{"version":"3","action":"getMeasurements"}}))
-        result =  ws.recv()
-        cache.set('measurements_raw', result, timeout=3000000)
-        res = result
-        ws.close()
+        rserve_conn = ePy.connect_to_rserve(host='localhost', port=6311)
+        rserve_conn.voidEval("""handle_request <- function(json_message)
+                             {
+                               message <- rjson:::fromJSON(json_message)
+                               msgData <- message$data
+                               action <- msgData$action
+                               out <- list(type="response",
+                                           requestId=message$requestId,
+                                           data=NULL)
+                               out$data <- epivizFileServer::handle_request(fileServer, action, msgData)
+                               epivizr:::toJSON(out)
+                            }""")
+
+        response = rserve_conn.r.handle_request('{"requestId":"1","type":"request","data":{"version":"3","action":"getMeasurements"}}')
+        res = response
+        cache.set('measurements_raw', res, timeout=3000000)
     return res
 
 # for testing
@@ -53,9 +66,9 @@ def get_dataProvider():
     res = {
         'success': True,
         'dataProviders': {
-            'serverName': 'Epiviz',
-            'serverURL': 'http://epiviz.cbcb.umd.edu/data/main.php?action=getMeasurements',
-            'serverType': 'MySQL' }
+            'serverName': 'EpivizFileServer',
+            'serverURL': 'http://localhost:8888',
+            'serverType': 'Websocket' }
     }
     return jsonify(res)
 
